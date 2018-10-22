@@ -30,12 +30,8 @@ class PostsController extends Controller
 //        $posts = Post::with('comments','comments.user')->get();
         $posts = Post::with('comments','comments.user','votes.user','comments.votes.user')->get();
         $posts = collect($posts->toArray())->map(function ($post){
-            $array =[];
             $nestedKeys = [];
-            foreach ($post['comments'] as $comment){
-                $array[$comment['id']] = $comment;
-            }
-            $post['comments'] = $array;
+            $post['comments'] = array_column($post['comments'], null, 'id');
             foreach ($post['comments'] as $key=>$comment){
                 if(!$parent_id=$comment['parent_id']){
                     continue;
@@ -67,12 +63,8 @@ class PostsController extends Controller
 //            }]);
 //        }]);
         $post = $post->load('comments','comments.user')->toArray();
-        $array =[];
         $nestedKeys = [];
-        foreach ($post['comments'] as $comment){
-            $array[$comment['id']] = $comment;
-        }
-        $post['comments'] = $array;
+        $post['comments'] = array_column($post['comments'], null, 'id');
         foreach ($post['comments'] as $key=>$comment){
             if(!$parent_id=$comment['parent_id']){
                 continue;
